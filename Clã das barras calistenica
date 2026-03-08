@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clã das Barras - CT de Treinamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Bebas+Neue&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .font-clan {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.05em;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+        
+        .card-glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .exercise-card {
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.2);
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+        
+        .timer-circle {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 1s linear;
+        }
+        
+        .muscle-group {
+            transition: all 0.3s ease;
+        }
+        
+        .muscle-group:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .hidden-section {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        
+        .difficulty-easy { background: #22c55e; }
+        .difficulty-medium { background: #eab308; }
+        .difficulty-hard { background: #dc2626; }
+        
+        .logo-glow {
+            filter: drop-shadow(0 0 20px rgba(220, 38, 38, 0.5));
+        }
+        
+        .nav-blur {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-clan {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
+        }
+        
+        .btn-clan:hover {
+            box-shadow: 0 6px 30px rgba(220, 38, 38, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .border-clan {
+            border-color: #dc2626;
+        }
+        
+        .text-clan {
+            color: #dc2626;
+        }
+        
+        .bg-clan {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full nav-blur z-50 border-b border-red-900/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-4 cursor-pointer" onclick="showSection('home')">
+                    <img src="/mnt/kimi/upload/1000023020.jpg" alt="Clã das Barras" class="w-12 h-12 rounded-full object-cover logo-glow">
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-clan font-bold tracking-wider text-white">CLÃ DAS BARRAS</span>
+                        <span class="text-xs text-red-500 font-clan tracking-widest">CT DE TREINAMENTO</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showSection('home')" class="hover:text-red-500 transition font-clan text-lg tracking-wide">INÍCIO</button>
+                    <button onclick="showSection('workouts')" class="hover:text-red-500 transition font-clan text-lg tracking-wide">TREINOS</button>
+                    <button onclick="showSection('skills')" class="hover:text-red-500 transition font-clan text-lg tracking-wide">HABILIDADES</button>
+                    <button onclick="showSection('progress')" class="hover:text-red-500 transition font-clan text-lg tracking-wide">PROGRESSO</button>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-xs text-gray-400 font-clan tracking-wider">NÍVEL ATUAL</div>
+                        <div class="text-sm font-bold text-red-500 font-clan tracking-wider" id="currentLevelDisplay">INICIANTE</div>
+                    </div>
+                    <button onclick="toggleProfile()" class="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-lg shadow-red-500/30">
+                        <i class="fas fa-user text-white"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="pt-28 pb-12 px-4 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <!-- Hero -->
+            <div class="text-center mb-16 fade-in">
+                <div class="mb-8 flex justify-center">
+                    <img src="/mnt/kimi/upload/1000023020.jpg" alt="Clã das Barras Logo" class="w-32 h-32 rounded-full object-cover logo-glow mb-4">
+                </div>
+                <h1 class="text-6xl md:text-8xl font-clan font-black mb-6 leading-none tracking-tight">
+                    CLÃ DAS<br>
+                    <span class="text-red-600">BARRAS</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-4 font-clan tracking-wide">
+                    CT DE TREINAMENTO • SINCE 2024
+                </p>
+                <p class="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+                    Do primeiro push-up ao muscle-up. Evolua com a metodologia do <strong>Personal Mark</strong> e torne-se parte do clã.
+                </p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="showSection('workouts')" class="px-10 py-5 btn-clan rounded-full font-clan font-bold text-xl hover:scale-105 transition transform tracking-wider">
+                        COMEÇAR TREINO <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    <button onclick="showSection('skills')" class="px-10 py-5 border-2 border-red-600 rounded-full font-clan font-bold text-xl hover:bg-red-600/10 transition tracking-wider">
+                        VER HABILIDADES
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <div class="card-glass rounded-2xl p-6 text-center border border-red-500/20">
+                    <div class="text-4xl font-clan font-bold text-red-500 mb-2">4</div>
+                    <div class="text-sm text-gray-400 font-clan tracking-wider">NÍVEIS DE DIFICULDADE</div>
+                </div>
+                <div class="card-glass rounded-2xl p-6 text-center border border-red-500/20">
+                    <div class="text-4xl font-clan font-bold text-red-500 mb-2">50+</div>
+                    <div class="text-sm text-gray-400 font-clan tracking-wider">EXERCÍCIOS</div>
+                </div>
+                <div class="card-glass rounded-2xl p-6 text-center border border-red-500/20">
+                    <div class="text-4xl font-clan font-bold text-red-500 mb-2">12</div>
+                    <div class="text-sm text-gray-400 font-clan tracking-wider">SEMANAS DE PROGRAMA</div>
+                </div>
+                <div class="card-glass rounded-2xl p-6 text-center border border-red-500/20">
+                    <div class="text-4xl font-clan font-bold text-red-500 mb-2">0</div>
+                    <div class="text-sm text-gray-400 font-clan tracking-wider">EQUIPAMENTO</div>
+                </div>
+            </div>
+
+            <!-- Level Selection -->
+            <h2 class="text-4xl font-clan font-bold mb-8 text-center tracking-wide">ESCOLHA SEU NÍVEL</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div onclick="selectLevel('beginner')" class="cursor-pointer exercise-card card-glass rounded-2xl p-6 border-l-4 border-green-500 hover:bg-white/5">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-clan font-bold tracking-wider">INICIANTE</span>
+                        <i class="fas fa-seedling text-green-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-clan font-bold mb-2 tracking-wide">FUNDAÇÕES</h3>
+                    <p class="text-sm text-gray-400 mb-4">Aprenda push-ups, agachamentos e barras. Construa base sólida.</p>
+                    <ul class="text-sm space-y-2 text-gray-300">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Push-ups inclinados</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Remadas australianas</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Agachamentos</li>
+                    </ul>
+                </div>
+
+                <div onclick="selectLevel('intermediate')" class="cursor-pointer exercise-card card-glass rounded-2xl p-6 border-l-4 border-yellow-500 hover:bg-white/5">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-clan font-bold tracking-wider">INTERMEDIÁRIO</span>
+                        <i class="fas fa-fire text-yellow-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-clan font-bold mb-2 tracking-wide">FORÇA & CONDICIONAMENTO</h3>
+                    <p class="text-sm text-gray-400 mb-4">Dominando pull-ups, dips e variações avançadas.</p>
+                    <ul class="text-sm space-y-2 text-gray-300">
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Pull-ups strictos</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Dips na barra</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Pike push-ups</li>
+                    </ul>
+                </div>
+
+                <div onclick="selectLevel('advanced')" class="cursor-pointer exercise-card card-glass rounded-2xl p-6 border-l-4 border-orange-500 hover:bg-white/5">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs font-clan font-bold tracking-wider">AVANÇADO</span>
+                        <i class="fas fa-bolt text-orange-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-clan font-bold mb-2 tracking-wide">SKILLS & POTÊNCIA</h3>
+                    <p class="text-sm text-gray-400 mb-4">Muscle-ups, handstands e levers. Dominação total.</p>
+                    <ul class="text-sm space-y-2 text-gray-300">
+                        <li><i class="fas fa-check text-orange-400 mr-2"></i>Muscle-ups</li>
+                        <li><i class="fas fa-check text-orange-400 mr-2"></i>Handstand holds</li>
+                        <li><i class="fas fa-check text-orange-400 mr-2"></i>Front lever</li>
+                    </ul>
+                </div>
+
+                <div onclick="selectLevel('elite')" class="cursor-pointer exercise-card card-glass rounded-2xl p-6 border-l-4 border-red-600 hover:bg-white/5">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 bg-red-600/20 text-red-500 rounded-full text-xs font-clan font-bold tracking-wider">ELITE</span>
+                        <i class="fas fa-crown text-red-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-clan font-bold mb-2 tracking-wide">MOVIMENTOS EXTREMOS</h3>
+                    <p class="text-sm text-gray-400 mb-4">One-arm skills, planches e movimentos de alto nível.</p>
+                    <ul class="text-sm space-y-2 text-gray-300">
+                        <li><i class="fas fa-check text-red-500 mr-2"></i>One-arm pull-up</li>
+                        <li><i class="fas fa-check text-red-500 mr-2"></i>Planche</li>
+                        <li><i class="fas fa-check text-red-500 mr-2"></i>Human flag</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workouts Section -->
+    <section id="workouts" class="pt-28 pb-12 px-4 hidden-section min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-5xl font-clan font-bold mb-2 tracking-wide">TREINOS DO DIA</h2>
+                    <p class="text-gray-400 font-clan tracking-wider">SELECIONE SEU NÍVEL E COMECE O TREINO</p>
+                </div>
+                <div class="flex gap-2 mt-4 md:mt-0">
+                    <button onclick="filterWorkouts('all')" class="px-4 py-2 rounded-full bg-white/10 hover:bg-red-600/20 transition text-sm font-clan tracking-wider">TODOS</button>
+                    <button onclick="filterWorkouts('push')" class="px-4 py-2 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition text-sm font-clan tracking-wider">PUSH</button>
+                    <button onclick="filterWorkouts('pull')" class="px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition text-sm font-clan tracking-wider">PULL</button>
+                    <button onclick="filterWorkouts('legs')" class="px-4 py-2 rounded-full bg-green-500/20 text-green-400 hover:bg-green-500/30 transition text-sm font-clan tracking-wider">LEGS</button>
+                    <button onclick="filterWorkouts('core')" class="px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition text-sm font-clan tracking-wider">CORE</button>
+                </div>
+            </div>
+
+            <div id="workoutContainer" class="space-y-6">
+                <!-- Workouts will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Workout Modal -->
+    <div id="activeWorkout" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full">
+            <div class="card-glass rounded-3xl p-8 relative border border-red-500/30">
+                <button onclick="closeWorkout()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <div class="text-sm text-red-500 font-clan tracking-widest mb-2" id="workoutCategory">CATEGORIA</div>
+                    <h2 class="text-4xl font-clan font-bold mb-4 tracking-wide" id="workoutTitle">Nome do Treino</h2>
+                    <div class="flex justify-center gap-4 text-sm font-clan tracking-wider">
+                        <span class="px-4 py-2 bg-white/10 rounded-full"><i class="fas fa-clock mr-2"></i><span id="workoutDuration">30 min</span></span>
+                        <span class="px-4 py-2 bg-white/10 rounded-full"><i class="fas fa-fire mr-2"></i><span id="workoutIntensity">Alta</span></span>
+                    </div>
+                </div>
+
+                <div id="exerciseList" class="space-y-4 mb-8 max-h-96 overflow-y-auto">
+                    <!-- Exercises populated by JS -->
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="startTimer()" class="flex-1 py-5 btn-clan rounded-xl font-clan font-bold text-xl hover:scale-105 transition tracking-wider">
+                        <i class="fas fa-play mr-2"></i>INICIAR TREINO
+                    </button>
+                    <button onclick="showExerciseDemo()" class="px-6 py-5 border-2 border-red-600 rounded-xl hover:bg-red-600/10 transition">
+                        <i class="fas fa-video text-red-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Overlay -->
+    <div id="timerOverlay" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center">
+        <div class="text-center">
+            <div class="mb-8">
+                <img src="/mnt/kimi/upload/1000023020.jpg" alt="Clã das Barras" class="w-24 h-24 rounded-full mx-auto logo-glow mb-4">
+            </div>
+            <div class="relative w-64 h-64 mx-auto mb-8">
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle cx="128" cy="128" r="120" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none"/>
+                    <circle id="timerCircle" class="timer-circle" cx="128" cy="128" r="120" stroke="#dc2626" stroke-width="8" fill="none"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-6xl font-clan font-bold" id="timerDisplay">00:00</div>
+                </div>
+            </div>
+            <h3 class="text-3xl font-clan font-bold mb-4 tracking-wide" id="timerExercise">DESCANSO</h3>
+            <div class="flex justify-center gap-4">
+                <button onclick="toggleTimer()" class="w-16 h-16 rounded-full btn-clan flex items-center justify-center text-2xl hover:scale-110 transition">
+                    <i class="fas fa-pause" id="timerIcon"></i>
+                </button>
+                <button onclick="skipTimer()" class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-2xl hover:bg-red-600/20 transition">
+                    <i class="fas fa-forward text-red-500"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Section -->
+    <section id="skills" class="pt-28 pb-12 px-4 hidden-section min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-clan font-bold mb-4 tracking-wide">ÁRVORE DE HABILIDADES</h2>
+                <p class="text-center text-gray-400 mb-8 max-w-2xl mx-auto font-clan tracking-wider">
+                    ACOMPANHE SUA PROGRESSÃO ATRAVÉS DAS HABILIDADES MAIS DESAFIADORAS DA CALISTENIA
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Push Skills -->
+                <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                    <h3 class="text-2xl font-clan font-bold mb-6 flex items-center text-red-500 tracking-wider">
+                        <i class="fas fa-arrow-up mr-3"></i>PUSH SKILLS
+                    </h3>
+                    <div class="space-y-4" id="pushSkills">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Pull Skills -->
+                <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                    <h3 class="text-2xl font-clan font-bold mb-6 flex items-center text-red-500 tracking-wider">
+                        <i class="fas fa-arrow-down mr-3"></i>PULL SKILLS
+                    </h3>
+                    <div class="space-y-4" id="pullSkills">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Core Skills -->
+                <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                    <h3 class="text-2xl font-clan font-bold mb-6 flex items-center text-red-500 tracking-wider">
+                        <i class="fas fa-circle mr-3"></i>CORE SKILLS
+                    </h3>
+                    <div class="space-y-4" id="coreSkills">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Section -->
+    <section id="progress" class="pt-28 pb-12 px-4 hidden-section min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-5xl font-clan font-bold mb-8 tracking-wide">SEU PROGRESSO</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                    <h3 class="text-xl font-clan font-bold mb-4 tracking-wider">NÍVEL ATUAL</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-3xl font-clan font-bold text-red-500" id="progressLevel">INICIANTE</span>
+                        <span class="text-sm text-gray-400 font-clan tracking-wider" id="progressPercent">0% PARA PRÓXIMO NÍVEL</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-4 mb-4">
+                        <div id="levelProgressBar" class="progress-bar bg-gradient-to-r from-red-600 to-red-900 h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p class="text-sm text-gray-400 font-clan tracking-wider">COMPLETE MAIS 5 TREINOS PARA DESBLOQUEAR O PRÓXIMO NÍVEL</p>
+                </div>
+
+                <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                    <h3 class="text-xl font-clan font-bold mb-4 tracking-wider">ESTATÍSTICAS</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-white/5 rounded-xl border border-red-500/10">
+                            <div class="text-3xl font-clan font-bold text-red-500" id="totalWorkouts">0</div>
+                            <div class="text-xs text-gray-400 font-clan tracking-wider">TREINOS COMPLETOS</div>
+                        </div>
+                        <div class="text-center p-4 bg-white/5 rounded-xl border border-red-500/10">
+                            <div class="text-3xl font-clan font-bold text-red-500" id="totalTime">0</div>
+                            <div class="text-xs text-gray-400 font-clan tracking-wider">MINUTOS TREINADOS</div>
+                        </div>
+                        <div class="text-center p-4 bg-white/5 rounded-xl border border-red-500/10">
+                            <div class="text-3xl font-clan font-bold text-red-500" id="currentStreak">0</div>
+                            <div class="text-xs text-gray-400 font-clan tracking-wider">DIAS SEGUIDOS</div>
+                        </div>
+                        <div class="text-center p-4 bg-white/5 rounded-xl border border-red-500/10">
+                            <div class="text-3xl font-clan font-bold text-red-500" id="skillsUnlocked">0</div>
+                            <div class="text-xs text-gray-400 font-clan tracking-wider">SKILLS DESBLOQUEADAS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glass rounded-2xl p-6 border border-red-500/20">
+                <h3 class="text-xl font-clan font-bold mb-6 tracking-wider">HISTÓRICO DE TREINOS</h3>
+                <div id="workoutHistory" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8 font-clan tracking-wider">NENHUM TREINO REGISTRADO AINDA. COMECE HOJE!</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 border-t border-red-900/20 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <img src="/mnt/kimi/upload/1000023020.jpg" alt="Clã das Barras" class="w-16 h-16 rounded-full mx-auto mb-4 logo-glow">
+            <h3 class="text-2xl font-clan font-bold mb-2">CLÃ DAS BARRAS</h3>
+            <p class="text-gray-400 text-sm font-clan tracking-wider mb-4">CT DE TREINAMENTO • PERSONAL MARK</p>
+            <p class="text-gray-600 text-xs">© 2024 Clã das Barras. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Structure
+        const workoutData = {
+            beginner: [
+                {
+                    id: 'b1',
+                    title: 'Fundamentos Full Body',
+                    category: 'full',
+                    duration: '30 min',
+                    difficulty: 'easy',
+                    exercises: [
+                        { name: 'Push-ups Inclinados', sets: 3, reps: '8-12', rest: 60, demo: 'incline-pushup' },
+                        { name: 'Remada Australiana', sets: 3, reps: '8-10', rest: 60, demo: 'australian-row' },
+                        { name: 'Agachamento', sets: 3, reps: '12-15', rest: 60, demo: 'squat' },
+                        { name: 'Plank', sets: 3, reps: '20-30s', rest: 45, demo: 'plank' },
+                        { name: 'Mountain Climbers', sets: 3, reps: '20', rest: 45, demo: 'mountain-climber' }
+                    ]
+                },
+                {
+                    id: 'b2',
+                    title: 'Push Iniciante',
+                    category: 'push',
+                    duration: '25 min',
+                    difficulty: 'easy',
+                    exercises: [
+                        { name: 'Push-ups Joelhos', sets: 4, reps: '10-12', rest: 60, demo: 'knee-pushup' },
+                        { name: 'Dips no Banco', sets: 3, reps: '8-10', rest: 60, demo: 'bench-dip' },
+                        { name: 'Pike Push-ups', sets: 3, reps: '6-8', rest: 60, demo: 'pike-pushup' },
+                        { name: 'Push-ups Negativos', sets: 3, reps: '5', rest: 90, demo: 'negative-pushup' }
+                    ]
+                },
+                {
+                    id: 'b3',
+                    title: 'Pull Iniciante',
+                    category: 'pull',
+                    duration: '25 min',
+                    difficulty: 'easy',
+                    exercises: [
+                        { name: 'Dead Hang', sets: 3, reps: '20-30s', rest: 60, demo: 'dead-hang' },
+                        { name: 'Remada Invertida Joelhos', sets: 4, reps: '8-10', rest: 60, demo: 'inverted-row' },
+                        { name: 'Pull-up Negativo', sets: 4, reps: '3-5', rest: 90, demo: 'negative-pullup' },
+                        { name: 'Scapular Pull-ups', sets: 3, reps: '8', rest: 60, demo: 'scapular-pullup' }
+                    ]
+                }
+            ],
+            intermediate: [
+                {
+                    id: 'i1',
+                    title: 'Push-Pull Superset',
+                    category: 'full',
+                    duration: '45 min',
+                    difficulty: 'medium',
+                    exercises: [
+                        { name: 'Pull-ups', sets: 4, reps: '6-8', rest: 90, demo: 'pullup' },
+                        { name: 'Dips Paralelas', sets: 4, reps: '8-10', rest: 90, demo: 'dip' },
+                        { name: 'Chin-ups', sets: 4, reps: '6-8', rest: 90, demo: 'chinup' },
+                        { name: 'Push-ups Diamante', sets: 4, reps: '8-12', rest: 60, demo: 'diamond-pushup' },
+                        { name: 'L-Sit', sets: 3, reps: '10-15s', rest: 60, demo: 'l-sit' }
+                    ]
+                },
+                {
+                    id: 'i2',
+                    title: 'Força de Empurrar',
+                    category: 'push',
+                    duration: '40 min',
+                    difficulty: 'medium',
+                    exercises: [
+                        { name: 'Push-ups Explosivos', sets: 4, reps: '8-10', rest: 60, demo: 'explosive-pushup' },
+                        { name: 'Dips na Barra', sets: 4, reps: '8-12', rest: 90, demo: 'bar-dip' },
+                        { name: 'Pike Push-ups Pernas Elevadas', sets: 4, reps: '6-8', rest: 90, demo: 'elevated-pike' },
+                        { name: 'Pseudo Planche Lean', sets: 4, reps: '20s', rest: 60, demo: 'planche-lean' }
+                    ]
+                },
+                {
+                    id: 'i3',
+                    title: 'Dominada Total',
+                    category: 'pull',
+                    duration: '40 min',
+                    difficulty: 'medium',
+                    exercises: [
+                        { name: 'Pull-ups Pronadas', sets: 5, reps: '5-8', rest: 120, demo: 'pullup' },
+                        { name: 'Chin-ups', sets: 4, reps: '6-8', rest: 90, demo: 'chinup' },
+                        { name: 'Remada Australiana Pernas Elevadas', sets: 4, reps: '10-12', rest: 60, demo: 'elevated-row' },
+                        { name: 'Hanging Knee Raises', sets: 4, reps: '10-12', rest: 60, demo: 'knee-raise' }
+                    ]
+                }
+            ],
+            advanced: [
+                {
+                    id: 'a1',
+                    title: 'Muscle-Up Focus',
+                    category: 'pull',
+                    duration: '50 min',
+                    difficulty: 'hard',
+                    exercises: [
+                        { name: 'Muscle-Up Transição', sets: 5, reps: '3-5', rest: 120, demo: 'muscle-up-transition' },
+                        { name: 'High Pull-ups', sets: 4, reps: '5-6', rest: 120, demo: 'high-pullup' },
+                        { name: 'Chest-to-Bar', sets: 4, reps: '5-8', rest: 120, demo: 'chest-bar' },
+                        { name: 'Dips Profundos', sets: 4, reps: '8-10', rest: 90, demo: 'deep-dip' },
+                        { name: 'Skin the Cat', sets: 3, reps: '5', rest: 90, demo: 'skin-cat' }
+                    ]
+                },
+                {
+                    id: 'a2',
+                    title: 'Handstand & Press',
+                    category: 'push',
+                    duration: '45 min',
+                    difficulty: 'hard',
+                    exercises: [
+                        { name: 'Handstand Hold Parede', sets: 5, reps: '30-45s', rest: 90, demo: 'handstand-wall' },
+                        { name: 'Handstand Shoulder Taps', sets: 4, reps: '10', rest: 60, demo: 'shoulder-taps' },
+                        { name: 'Pike Push-ups Pés Elevados', sets: 4, reps: '6-8', rest: 90, demo: 'pike-elevated' },
+                        { name: 'Frog Stand', sets: 4, reps: '20-30s', rest: 60, demo: 'frog-stand' }
+                    ]
+                },
+                {
+                    id: 'a3',
+                    title: 'Front Lever Progress',
+                    category: 'core',
+                    duration: '40 min',
+                    difficulty: 'hard',
+                    exercises: [
+                        { name: 'Tuck Front Lever', sets: 4, reps: '10-15s', rest: 120, demo: 'tuck-lever' },
+                        { name: 'Advanced Tuck Front Lever', sets: 4, reps: '8-12s', rest: 120, demo: 'adv-tuck-lever' },
+                        { name: 'Ice Cream Makers', sets: 4, reps: '6-8', rest: 90, demo: 'ice-cream' },
+                        { name: 'Hollow Body Hold', sets: 3, reps: '30s', rest: 60, demo: 'hollow-body' }
+                    ]
+                }
+            ],
+            elite: [
+                {
+                    id: 'e1',
+                    title: 'One Arm Mastery',
+                    category: 'pull',
+                    duration: '60 min',
+                    difficulty: 'hard',
+                    exercises: [
+                        { name: 'One Arm Negatives', sets: 4, reps: '3-5', rest: 180, demo: 'oa-negative' },
+                        { name: 'Archer Pull-ups', sets: 4, reps: '5-6', rest: 120, demo: 'archer-pullup' },
+                        { name: 'Typewriter Pull-ups', sets: 4, reps: '4-6', rest: 120, demo: 'typewriter' },
+                        { name: 'Weighted Pull-ups', sets: 4, reps: '5-8', rest: 180, demo: 'weighted-pullup' }
+                    ]
+                },
+                {
+                    id: 'e2',
+                    title: 'Planche Progressions',
+                    category: 'push',
+                    duration: '60 min',
+                    difficulty: 'hard',
+                    exercises: [
+                        { name: 'Straddle Planche', sets: 4, reps: '5-10s', rest: 180, demo: 'straddle-planche' },
+                        { name: 'Planche Lean', sets: 4, reps: '20-30s', rest: 90, demo: 'planche-lean' },
+                        { name: 'Pseudo Planche Push-ups', sets: 4, reps: '5-8', rest: 120, demo: 'pseudo-planche' },
+                        { name: 'Tuck Planche', sets: 4, reps: '10-15s', rest: 120, demo: 'tuck-planche' }
+                    ]
+                }
+            ]
+        };
+
+        const skillsData = {
+            push: [
+                { name: 'Push-up', level: 1, unlocked: true },
+                { name: 'Diamond Push-up', level: 2, unlocked: false },
+                { name: 'Pseudo Planche', level: 3, unlocked: false },
+                { name: 'Handstand', level: 4, unlocked: false },
+                { name: 'Handstand Push-up', level: 5, unlocked: false },
+                { name: 'Planche', level: 6, unlocked: false },
+                { name: '90 Degree Push-up', level: 7, unlocked: false }
+            ],
+            pull: [
+                { name: 'Australian Row', level: 1, unlocked: true },
+                { name: 'Pull-up', level: 2, unlocked: false },
+                { name: 'Muscle-up', level: 3, unlocked: false },
+                { name: 'Front Lever', level: 4, unlocked: false },
+                { name: 'Back Lever', level: 5, unlocked: false },
+                { name: 'One Arm Pull-up', level: 6, unlocked: false },
+                { name: 'Iron Cross', level: 7, unlocked: false }
+            ],
+            core: [
+                { name: 'Plank', level: 1, unlocked: true },
+                { name: 'L-Sit', level: 2, unlocked: false },
+                { name: 'V-Sit', level: 3, unlocked: false },
+                { name: 'Manna', level: 4, unlocked: false },
+                { name: 'Dragon Flag', level: 5, unlocked: false },
+                { name: 'Human Flag', level: 6, unlocked: false }
+            ]
+        };
+
+        let currentLevel = 'beginner';
+        let currentWorkout = null;
+        let timerInterval = null;
+        let timerRunning = false;
+        let timeLeft = 0;
+        let currentExerciseIndex = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            renderWorkouts();
+            renderSkills();
+            updateStats();
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('hidden-section');
+            });
+            
+            const selected = document.getElementById(sectionId);
+            selected.classList.remove('hidden-section');
+            selected.classList.add('fade-in');
+            
+            window.scrollTo(0, 0);
+        }
+
+        function selectLevel(level) {
+            currentLevel = level;
+            const levelNames = {
+                beginner: 'INICIANTE',
+                intermediate: 'INTERMEDIÁRIO',
+                advanced: 'AVANÇADO',
+                elite: 'ELITE'
+            };
+            document.getElementById('currentLevelDisplay').textContent = levelNames[level];
+            showSection('workouts');
+            renderWorkouts();
+            localStorage.setItem('calisthenicsLevel', level);
+        }
+
+        function renderWorkouts() {
+            const container = document.getElementById('workoutContainer');
+            container.innerHTML = '';
+            
+            const workouts = workoutData[currentLevel] || [];
+            
+            workouts.forEach(workout => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card card-glass rounded-2xl p-6 cursor-pointer border border-red-500/10 hover:border-red-500/30';
+                card.onclick = () => openWorkout(workout);
+                
+                const difficultyDots = Array(3).fill(0).map((_, i) => 
+                    `<span class="difficulty-dot ${i < (workout.difficulty === 'easy' ? 1 : workout.difficulty === 'medium' ? 2 : 3) ? 
+                        (workout.difficulty === 'easy' ? 'difficulty-easy' : 
+                         workout.difficulty === 'medium' ? 'difficulty-medium' : 'difficulty-hard') : 'bg-gray-600'}"></span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-clan font-bold tracking-wider ${getCategoryColor(workout.category)}">
+                                ${workout.category.toUpperCase()}
+                            </span>
+                            <div class="flex">${difficultyDots}</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-clan font-bold mb-2 tracking-wide">${workout.title}</h3>
+                    <div class="flex items-center space-x-4 text-sm text-gray-400 font-clan tracking-wider">
+                        <span><i class="fas fa-clock mr-2 text-red-500"></i>${workout.duration}</span>
+                        <span><i class="fas fa-dumbbell mr-2 text-red-500"></i>${workout.exercises.length} EXERCÍCIOS</span>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                push: 'bg-red-500/20 text-red-400',
+                pull: 'bg-blue-500/20 text-blue-400',
+                legs: 'bg-green-500/20 text-green-400',
+                core: 'bg-yellow-500/20 text-yellow-400',
+                full: 'bg-purple-500/20 text-purple-400'
+            };
+            return colors[category] || 'bg-gray-500/20 text-gray-400';
+        }
+
+        function openWorkout(workout) {
+            currentWorkout = workout;
+            document.getElementById('workoutTitle').textContent = workout.title;
+            document.getElementById('workoutCategory').textContent = workout.category.toUpperCase();
+            document.getElementById('workoutDuration').textContent = workout.duration;
+            document.getElementById('workoutIntensity').textContent = 
+                workout.difficulty === 'easy' ? 'BAIXA' : 
+                workout.difficulty === 'medium' ? 'MÉDIA' : 'ALTA';
+            
+            const list = document.getElementById('exerciseList');
+            list.innerHTML = '';
+            
+            workout.exercises.forEach((ex, idx) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-4 bg-white/5 rounded-xl border border-red-500/10';
+                item.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-clan font-bold text-lg">
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <div class="font-clan font-bold tracking-wide">${ex.name}</div>
+                            <div class="text-sm text-gray-400 font-clan tracking-wider">${ex.sets} SETS × ${ex.reps}</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 font-clan tracking-wider">
+                        <i class="fas fa-stopwatch mr-1 text-red-500"></i>${ex.rest}S
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            
+            document.getElementById('activeWorkout').classList.remove('hidden');
+        }
+
+        function closeWorkout() {
+            document.getElementById('activeWorkout').classList.add('hidden');
+            stopTimer();
+        }
+
+        function startTimer() {
+            document.getElementById('timerOverlay').classList.remove('hidden');
+            currentExerciseIndex = 0;
+            startRestTimer(currentWorkout.exercises[0].rest);
+        }
+
+        function startRestTimer(seconds) {
+            timeLeft = seconds;
+            updateTimerDisplay();
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (timerRunning) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        nextExercise();
+                    }
+                }
+            }, 1000);
+            
+            timerRunning = true;
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const maxTime = currentWorkout.exercises[currentExerciseIndex]?.rest || 60;
+            const offset = 283 - (timeLeft / maxTime) * 283;
+            document.getElementById('timerCircle').style.strokeDashoffset = offset;
+            
+            const nextEx = currentWorkout.exercises[currentExerciseIndex + 1];
+            document.getElementById('timerExercise').textContent = 
+                nextEx ? `PRÓXIMO: ${nextEx.name.toUpperCase()}` : 'TREINO FINALIZADO!';
+        }
+
+        function toggleTimer() {
+            timerRunning = !timerRunning;
+            document.getElementById('timerIcon').className = 
+                timerRunning ? 'fas fa-pause' : 'fas fa-play';
+        }
+
+        function skipTimer() {
+            nextExercise();
+        }
+
+        function nextExercise() {
+            currentExerciseIndex++;
+            if (currentExerciseIndex < currentWorkout.exercises.length) {
+                startRestTimer(currentWorkout.exercises[currentExerciseIndex].rest);
+            } else {
+                finishWorkout();
+            }
+        }
+
+        function finishWorkout() {
+            stopTimer();
+            document.getElementById('timerOverlay').classList.add('hidden');
+            document.getElementById('activeWorkout').classList.add('hidden');
+            
+            saveWorkoutCompletion(currentWorkout);
+            
+            alert('PARABÉNS! TREINO COMPLETADO! 💪🔥');
+            updateStats();
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerRunning = false;
+        }
+
+        function renderSkills() {
+            renderSkillCategory('pushSkills', skillsData.push, 'red');
+            renderSkillCategory('pullSkills', skillsData.pull, 'red');
+            renderSkillCategory('coreSkills', skillsData.core, 'red');
+        }
+
+        function renderSkillCategory(containerId, skills, color) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            skills.forEach((skill, idx) => {
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-3 rounded-lg ${skill.unlocked ? 'bg-red-500/10 border border-red-500/30' : 'bg-white/5 border border-white/10'}`;
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full ${skill.unlocked ? 'bg-red-600' : 'bg-gray-600'} flex items-center justify-center text-xs font-clan font-bold">
+                            ${skill.level}
+                        </div>
+                        <span class="${skill.unlocked ? 'text-white font-clan tracking-wider' : 'text-gray-400 font-clan tracking-wider'}">${skill.name}</span>
+                    </div>
+                    ${skill.unlocked ? '<i class="fas fa-check text-red-500"></i>' : '<i class="fas fa-lock text-gray-600"></i>'}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveWorkoutCompletion(workout) {
+            let history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+            history.push({
+                date: new Date().toISOString(),
+                workout: workout.title,
+                level: currentLevel,
+                duration: workout.duration
+            });
+            localStorage.setItem('workoutHistory', JSON.stringify(history));
+            
+            let stats = JSON.parse(localStorage.getItem('userStats') || '{"totalWorkouts":0,"totalTime":0,"streak":0,"lastWorkout":null}');
+            stats.totalWorkouts++;
+            stats.totalTime += parseInt(workout.duration);
+            
+            const today = new Date().toDateString();
+            const lastWorkout = stats.lastWorkout ? new Date(stats.lastWorkout).toDateString() : null;
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastWorkout === yesterday.toDateString()) {
+                stats.streak++;
+            } else if (lastWorkout !== today) {
+                stats.streak = 1;
+            }
+            
+            stats.lastWorkout = new Date().toISOString();
+            localStorage.setItem('userStats', JSON.stringify(stats));
+        }
+
+        function updateStats() {
+            const stats = JSON.parse(localStorage.getItem('userStats') || '{"totalWorkouts":0,"totalTime":0,"streak":0}');
+            document.getElementById('totalWorkouts').textContent = stats.totalWorkouts;
+            document.getElementById('totalTime').textContent = stats.totalTime;
+            document.getElementById('currentStreak').textContent = stats.streak;
+            
+            const workoutsNeeded = 10;
+            const progress = Math.min((stats.totalWorkouts % workoutsNeeded) / workoutsNeeded * 100, 100);
+            document.getElementById('levelProgressBar').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.floor(progress) + '% PARA PRÓXIMO NÍVEL';
+            
+            const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
+            const historyContainer = document.getElementById('workoutHistory');
+            
+            if (history.length > 0) {
+                historyContainer.innerHTML = history.slice(-5).reverse().map(h => `
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-red-500/10">
+                        <div>
+                            <div class="font-clan font-bold tracking-wide">${h.workout}</div>
+                            <div class="text-sm text-gray-400 font-clan tracking-wider">${new Date(h.date).toLocaleDateString('pt-BR')}</div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs ${getCategoryColor(h.level)} font-clan tracking-wider">
+                            ${h.level.toUpperCase()}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function loadProgress() {
+            const savedLevel = localStorage.getItem('calisthenicsLevel');
+            if (savedLevel) {
+                currentLevel = savedLevel;
+                const levelNames = {
+                    beginner: 'INICIANTE',
+                    intermediate: 'INTERMEDIÁRIO',
+                    advanced: 'AVANÇADO',
+                    elite: 'ELITE'
+                };
+                document.getElementById('currentLevelDisplay').textContent = levelNames[savedLevel];
+            }
+        }
+
+        function filterWorkouts(category) {
+            const cards = document.querySelectorAll('#workoutContainer > div');
+            cards.forEach(card => {
+                const cat = card.querySelector('.px-3').textContent.toLowerCase();
+                if (category === 'all' || cat === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function showExerciseDemo() {
+            alert('DEMONSTRAÇÃO EM VÍDEO DISPONÍVEL NA VERSÃO PREMIUM! 🎥');
+        }
+
+        function toggleProfile() {
+            alert('PERFIL DO USUÁRIO - PERSONALIZE SUAS CONFIGURAÇÕES AQUI!');
+        }
+    </script>
+</body>
+</html>
